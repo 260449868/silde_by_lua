@@ -78,6 +78,7 @@ function ret.findway(self)
 			if startdata.color ~= 0 then
 				local startpoint = {x=i,y=j}
 				local bptable = {startpoint}
+				print(i)
 				
 			end
 		end
