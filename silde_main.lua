@@ -78,7 +78,17 @@ function ret.findway(self)
 			if startdata.color ~= 0 then
 				local startpoint = {x=i,y=j}
 				local bptable = {startpoint}
-				print(i)
+
+				local function  findnext(point)
+					if point.color == 0 then
+						--end
+					else
+						local nextpoint = nil
+						
+					end
+
+
+				end
 				
 			end
 		end
