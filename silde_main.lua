@@ -1,4 +1,5 @@
 require "print_r"
+local table = table
 local ret = {}
 
 ret.size_w = 5
@@ -78,7 +79,7 @@ function ret.findway(self,min_step)
 	local data = self.data
 	local acess = {}
 	local ntable = nil
-	local nval = 0
+	local nval = 1
 	for i=1,self.size_w do
 		for j=1,self.size_h do
 			local startdata = data[i][j]
