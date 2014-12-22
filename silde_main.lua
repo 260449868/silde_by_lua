@@ -1,3 +1,4 @@
+require "print_r"
 local ret = {}
 
 ret.size_w = 5
@@ -40,12 +41,13 @@ function ret.run(self,_way)
 	for i=1,#(_way) do
 		local point = _way[i]
 		local datav = data[point.x][point.y]
-		datav.color = datav.ttype = 0
+		datav.color = 0
+		datav.ttype = 0
 	end
 	if self.listener then self.listener("run_way",{way = _way}) end
 end
 
---填充
+--[[fill the blank]]
 function ret.fill(self)
 	for i=1,self.size_w do
 		for j=1,self.size_h-1 do
@@ -71,28 +73,86 @@ function ret.fill(self)
 	if self.listener then self.listener("fill_end") end
 end
 
-function ret.findway(self)
+--[[find the way at least min_step steps,if not found,it will return the max-step way]]
+function ret.findway(self,min_step)
+	local data = self.data
+	local acess = {}
+	local ntable = nil
+	local nval = 0
 	for i=1,self.size_w do
 		for j=1,self.size_h do
 			local startdata = data[i][j]
 			if startdata.color ~= 0 then
+				local wtable = {}
 				local startpoint = {x=i,y=j}
-				local bptable = {startpoint}
-
+				local cptable = {}
 				local function  findnext(point)
-					if point.color == 0 then
-						--end
-					else
-						local nextpoint = nil
-						
+					table.insert(wtable,point)
+					local px = point.x
+					local py = point.y
+					local sdata = data[px][px]
+					local bnext = false
+					local npos = px+py*self.size_h
+					cptable[ npos ] = 1
+					if px<self.size_w and not cptable[ npos+1 ] then
+						if data[px][py].color == data[px+1][py].color or data[px][py].ttpye == data[px+1][py].ttpye then
+							local retv = findnext({x=px+1,y=py})
+							if retv then return retv end
+							bnext = true
+						end
 					end
-
-
+					if px>1 and not cptable[ npos-1 ] then
+						if data[px][py].color == data[px-1][py].color or data[px][py].ttpye == data[px-1][py].ttpye then
+							local retv = findnext({x=px-1,y=py})
+							if retv then return retv end
+							bnext = true
+						end
+					end
+					if py<self.size_h and not cptable[ npos+self.size_h ] then
+						if data[px][py].color == data[px][py+1].color or data[px][py].ttpye == data[px][py+1].ttpye then
+							local retv = findnext({x=px,y=py+1})
+							if retv then return retv end
+							bnext = true
+						end
+					end
+					if py>1 and not cptable[ npos-self.size_h ] then
+						if data[px][py].color == data[px][py-1].color or data[px][py].ttpye == data[px][py-1].ttpye then
+							local retv = findnext({x=px,y=py-1})
+							if retv then return retv end
+							bnext = true
+						end
+					end
+					if bnext == false then
+						local tsize = #(wtable)
+						if min_step and tsize >= min_step then
+							return wtable
+						end
+						if nval<tsize then
+							ntable = {}
+							local tinsert = table.insert
+							table.foreachi(wtable, function(i, v) tinsert(ntable,v) end)
+							nval = tsize
+						end
+					end
+					table.remove(wtable)
+					cptable[ npos ] = nil
 				end
-				
+				local retv = findnext(startpoint)
+				if retv then return retv end
 			end
 		end
 	end
+	return ntable
 end
+
+local mtable = {}
+function mtable.__tostring(self)
+	return getstr_r(self.data)
+end
+setmetatable(ret, mtable)
+
+ret:init()
+local result = ret:findway(10)
+print_r(result)
 
 return ret
