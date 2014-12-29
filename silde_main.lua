@@ -1,4 +1,5 @@
 require "print_r"
+local tcopy = require "copy_table"
 local table = table
 local ret = {}
 
@@ -50,7 +51,7 @@ end
 
 --[[fill the blank]]
 function ret.fill(self)
-	for i=1,self.size_w do
+	--[[for i=1,self.size_w do
 		for j=1,self.size_h-1 do
 			local data1 = data[i][j]
 			local data2 = data[i][j+1]
@@ -60,7 +61,7 @@ function ret.fill(self)
 				data[i][j+1] = temp
 			end
 		end
-	end
+	end]]
 	for i=1,self.size_w do
 		for j=1,self.size_h do
 			local datav = data[i][j]
@@ -146,14 +147,17 @@ function ret.findway(self,min_step)
 	return ntable
 end
 
+function ret.new(self)
+	return tcopy.copytable(self)
+end
 local mtable = {}
 function mtable.__tostring(self)
 	return getstr_r(self.data)
 end
 setmetatable(ret, mtable)
 
-ret:init()
-local result = ret:findway(10)
-print_r(result)
+--ret:init()
+--local result = ret:findway(10)
+--print_r(result)
 
 return ret
