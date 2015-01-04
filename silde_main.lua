@@ -14,7 +14,7 @@ ret.listener = nil
 function ret.init(self)
 	for i=1,self.size_w do
 		for j=1,self.size_h do
-			local tt = { color = math.random(1,self.color_cnt),ttpye = math.random(1,self.type_cnt) }
+			local tt = {x=i,y=j, color = math.random(1,self.color_cnt),ttype = math.random(1,self.type_cnt) }
 			if not self.data[i] then self.data[i] = {} end
 			self.data[i][j] = tt
 		end
@@ -33,16 +33,16 @@ function ret.run(self,_way)
 	for i=1,#(_way)-1 do
 		local point1 = _way[i]
 		local point2 = _way[i+1]
-		local data1 = data[point1.x][point1.y]
-		local data2 = data[point2.x][point2.y]
-		if data1.color ~= data2.color and data1.ttpye ~= data2.ttpye then
+		local data1 = self.data[point1.x][point1.y]
+		local data2 = self.data[point2.x][point2.y]
+		if data1.color ~= data2.color and data1.ttype ~= data2.ttype then
 			error("the way is error")
 			return
 		end
 	end
 	for i=1,#(_way) do
 		local point = _way[i]
-		local datav = data[point.x][point.y]
+		local datav = self.data[point.x][point.y]
 		datav.color = 0
 		datav.ttype = 0
 	end
@@ -62,12 +62,15 @@ function ret.fill(self)
 			end
 		end
 	end]]
+	local data = self.data
 	for i=1,self.size_w do
 		for j=1,self.size_h do
 			local datav = data[i][j]
 			if datav.color == 0 then
+				datav.x = i
+				datav.y = j
 				datav.color = math.random(1,self.color_cnt)
-				datav.ttpye = math.random(1,self.type_cnt)
+				datav.ttype = math.random(1,self.type_cnt)
 				if self.listener then self.listener("fill_data",{ x=i,y=j,data=datav }) end
 			end
 		end
@@ -97,28 +100,28 @@ function ret.findway(self,min_step)
 					local npos = px+py*self.size_h
 					cptable[ npos ] = 1
 					if px<self.size_w and not cptable[ npos+1 ] then
-						if data[px][py].color == data[px+1][py].color or data[px][py].ttpye == data[px+1][py].ttpye then
+						if data[px][py].color == data[px+1][py].color or data[px][py].ttype == data[px+1][py].ttype then
 							local retv = findnext({x=px+1,y=py})
 							if retv then return retv end
 							bnext = true
 						end
 					end
 					if px>1 and not cptable[ npos-1 ] then
-						if data[px][py].color == data[px-1][py].color or data[px][py].ttpye == data[px-1][py].ttpye then
+						if data[px][py].color == data[px-1][py].color or data[px][py].ttype == data[px-1][py].ttype then
 							local retv = findnext({x=px-1,y=py})
 							if retv then return retv end
 							bnext = true
 						end
 					end
 					if py<self.size_h and not cptable[ npos+self.size_h ] then
-						if data[px][py].color == data[px][py+1].color or data[px][py].ttpye == data[px][py+1].ttpye then
+						if data[px][py].color == data[px][py+1].color or data[px][py].ttype == data[px][py+1].ttype then
 							local retv = findnext({x=px,y=py+1})
 							if retv then return retv end
 							bnext = true
 						end
 					end
 					if py>1 and not cptable[ npos-self.size_h ] then
-						if data[px][py].color == data[px][py-1].color or data[px][py].ttpye == data[px][py-1].ttpye then
+						if data[px][py].color == data[px][py-1].color or data[px][py].ttype == data[px][py-1].ttype then
 							local retv = findnext({x=px,y=py-1})
 							if retv then return retv end
 							bnext = true
