@@ -18,21 +18,27 @@ end
 function mtable:post_event(...)
 	self.list_listener = self.list_listener or {}
 	for k,v in pairs(self.list_listener) do
-		v(...)
+		v(self,...)
 	end
 end
+
+local register_t = {}
 
 function ret:register(ttable)
 	local lmtable = getmetatable(ttable)
 	lmtable = lmtable or {}
+	if register_t[lmtable] == 1 then
+		return
+	end
 	for k,v in pairs(mtable) do
 		if lmtable[k] then
-			error("the function '"..k.."'' is already exsit")
+			error("the value '"..k.."'' is already exsit")
 		end
 		lmtable[k] = v
 	end
 	lmtable.__index = lmtable.__index or lmtable
 	setmetatable(ttable,lmtable)
+	register_t[lmtable] = 1
 end
 
 --[[
