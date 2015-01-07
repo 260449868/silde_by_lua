@@ -9,6 +9,14 @@ local ret = {}
 	end_phase
 ]]
 
+--[[
+	listener priority:
+	1.during the phase
+	2.the skill almost in this priority
+	5.default priority
+	9.client effect
+]]
+
 local meta_fighter = {}
 meta_fighter.__index = meta_fighter
 
@@ -63,10 +71,10 @@ local event_switch = {
 		local param_data = this.param_data
 		local damage = tphase_data[1]
 		local aper = param_data.strength*0.1
-		aper = aper*(1+param_data.atk_per)
-		damage = damage*(1+aper)
+		--local aper2 = aper*(1+param_data.atk_per)
+		damage = damage*(1+aper)*(1+param_data.atk_per)
 		etag.damage = damage
-		this.target:post_event("defent_phase",etag)
+		this.target:insert_event("defent_phase",etag)
 	end,
 	defent_phase = function ( this,etag )
 		local damage = etag.damage or 0
@@ -74,13 +82,14 @@ local event_switch = {
 		local param_data = this.param_data
 		local armor = ttphase_data[2]
 		local dper = param_data.strength*0.05
-		dper = dper*(1+param_data.def_per)
-		damage = damage-dper
+		--dper = dper*(1+param_data.def_per)
+		armor = armor*(1+dper)*(1+param_data.def_per)
+		damage = damage-armor
 		if damage<=0 then damage = 1 end
 		etag.damage = damage
 	end,
 	attack_phase = function ( this,etag )
-		this.target:post_event("hurt_phase",etag)
+		this.target:insert_event("hurt_phase",etag)
 	end,
 	hurt_phase = function ( this,etag )
 		local damage = etag.damage or 0
@@ -103,7 +112,7 @@ function ret:create_fighter()
 	local fighter = {}
 	setmetatable(fighter,meta_fighter)
 	listener:register(fighter)
-	fighter:add_listener(fighter.on_event)
+	fighter:add_listener(fighter.on_event,1)
 	fighter:init()
 	return fighter
 end
@@ -113,7 +122,7 @@ local p1 = ret:create_fighter()
 local p2 = ret:create_fighter()
 p1:set_target(p2)
 p2:set_target(p1)
-p1.param_data = {hp = 100,strength = 0,atk_per = 0,def_per = 0}
+p1.param_data = {hp = 100,strength = 0,atk_per = 0.1,def_per = 0}
 p2.param_data = {hp = 100,strength = 0,atk_per = 0,def_per = 0}
 for i=1,999 do
 	local way = {}

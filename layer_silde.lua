@@ -159,7 +159,7 @@ function ret.create_sildelayer(self,width,height,ntype,ncolor)
 	local layer = CCLayer:create()
 	layer.sdata = self:create_sildedata(width,height,ntype,ncolor)
 
-	local function event_listener(etype,etag)
+	local function event_listener(self,etype,etag)
 		if etype == "init" then
 
 		elseif etype == "run_way" then
@@ -191,7 +191,7 @@ function ret.create_sildelayer(self,width,height,ntype,ncolor)
 		if layer.listener then layer.listener(etype,etag) end
 		print(etype)
 	end
-	layer.sdata.listener = event_listener
+	layer.sdata:add_listener(event_listener,1)
 	initl(layer)
 
 	return layer

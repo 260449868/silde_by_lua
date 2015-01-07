@@ -19,7 +19,8 @@ function ret.init(self)
 			self.data[i][j] = tt
 		end
 	end
-	if self.listener then self.listener("init") end
+	self:post_event("init")
+	--if self.listener then self.listener("init") end
 end
 
 function ret.run(self,_way)
@@ -46,7 +47,8 @@ function ret.run(self,_way)
 		datav.color = 0
 		datav.ttype = 0
 	end
-	if self.listener then self.listener("run_way",{way = _way}) end
+	self:post_event("init",{way = _way})
+	--if self.listener then self.listener("run_way",{way = _way}) end
 end
 
 --[[fill the blank]]
@@ -71,11 +73,13 @@ function ret.fill(self)
 				datav.y = j
 				datav.color = math.random(1,self.color_cnt)
 				datav.ttype = math.random(1,self.type_cnt)
-				if self.listener then self.listener("fill_data",{ x=i,y=j,data=datav }) end
+				self:post_event("fill_data",{ x=i,y=j,data=datav })
+				--if self.listener then self.listener("fill_data",{ x=i,y=j,data=datav }) end
 			end
 		end
 	end
-	if self.listener then self.listener("fill_end") end
+	self:post_event("fill_end")
+	--if self.listener then self.listener("fill_end") end
 end
 
 --[[find the way at least min_step steps,if not found,it will return the max-step way]]
@@ -159,6 +163,8 @@ function mtable.__tostring(self)
 end
 setmetatable(ret, mtable)
 
+local listener = require "event_listener"
+listener:register(ret)
 --ret:init()
 --local result = ret:findway(10)
 --print_r(result)
