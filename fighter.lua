@@ -1,4 +1,5 @@
 local listener = require "event_listener"
+local skill = require "skill"
 local ret = {}
 
 --[[event_type -- order by time
@@ -108,6 +109,8 @@ function meta_fighter:on_event(etype,...)
 	end
 end
 
+skill:init(meta_fighter)
+
 function ret:create_fighter()
 	local fighter = {}
 	setmetatable(fighter,meta_fighter)
@@ -122,7 +125,9 @@ local p1 = ret:create_fighter()
 local p2 = ret:create_fighter()
 p1:set_target(p2)
 p2:set_target(p1)
-p1.param_data = {hp = 100,strength = 0,atk_per = 0.1,def_per = 0}
+p1.param_data = {hp = 100,strength = 0,atk_per = 0,def_per = 0}
+p1:add_skill(1001)
+p1:add_skill(1002)
 p2.param_data = {hp = 100,strength = 0,atk_per = 0,def_per = 0}
 for i=1,999 do
 	local way = {}
@@ -130,11 +135,14 @@ for i=1,999 do
 		way[j] = {ttype = math.random(1,3),color = math.random(1,5)}
 	end
 	if i%2 == 1 then
+		p1:ativate_skill(1001)
+		p1:ativate_skill(1002)
 		p1:post_event("run_way",way)
 	else
 		p2:post_event("run_way",way)
 	end
 	print("turn"..i.." p1.hp "..p1.param_data.hp.." p2.hp "..p2.param_data.hp.." damage "..way.damage)
 end
+
 
 return ret
